@@ -39,22 +39,20 @@ android {
     }
 
     signingConfigs {
-        if (keystorePropertiesFile.exists()) {
-            register("release") {
-                keyAlias = keystoreProperties.getProperty("keyAlias")
-                keyPassword = keystoreProperties.getProperty("keyPassword")
-                storeFile = file(keystoreProperties.getProperty("storeFile"))
-                storePassword = keystoreProperties.getProperty("storePassword")
+        if (hasSigningCredentials) {
+            release {
+                storeFile resolvedKeystore
+                storePassword mKeystorePassword
+                keyAlias mKeyAlias
+                keyPassword mKeyPassword
             }
-        } else if (hasSigningVars()) {
-            register("release") {
-                keyAlias = providers.environmentVariable("SIGNING_KEY_ALIAS").get()
-                keyPassword = providers.environmentVariable("SIGNING_KEY_PASSWORD").get()
-                storeFile = file(providers.environmentVariable("SIGNING_STORE_FILE").get())
-                storePassword = providers.environmentVariable("SIGNING_STORE_PASSWORD").get()
+
+            debug {
+                storeFile resolvedKeystore
+                storePassword mKeystorePassword
+                keyAlias mKeyAlias
+                keyPassword mKeyPassword
             }
-        } else {
-            logger.warn("Warning: No signing config found. Build will be unsigned.")
         }
     }
 
